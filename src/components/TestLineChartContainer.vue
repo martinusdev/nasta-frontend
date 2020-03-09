@@ -7,6 +7,7 @@ import Component from "vue-class-component";
 import Vue from "vue";
 import LineChart from "@/lib/charts/LineChart";
 import { ChartData, ChartOptions } from "chart.js";
+import Axios from "axios";
 
 @Component({
   components: {
@@ -30,7 +31,6 @@ export default class TestLineChartContainer extends Vue {
     this.loaded = false;
     try {
       // TODO load data from API or whatever
-      // const { userlist } = await fetch('/api/userlist');
       this.chartData = {
         labels: [1, 2, 3, 4],
         datasets: [
@@ -69,7 +69,7 @@ export default class TestLineChartContainer extends Vue {
       };
       this.loaded = true;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
 }

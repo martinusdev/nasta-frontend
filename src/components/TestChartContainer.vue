@@ -7,6 +7,7 @@ import Component from "vue-class-component";
 import Vue from "vue";
 import BarChart from "@/lib/charts/BarChart";
 import { ChartData, ChartOptions } from "chart.js";
+import Axios from "axios";
 
 @Component({
   components: {
@@ -31,32 +32,48 @@ export default class TestChartContainer extends Vue {
     try {
       // TODO load data from API or whatever
       // const { userlist } = await fetch('/api/userlist');
-      this.chartData = {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December"
-        ],
-        datasets: [
-          {
-            label: "GitHub Commits",
-            backgroundColor: "#f87979",
-            data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
+
+      Axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+
+          const labels: string[] = [];
+          const values: number[] = [];
+          for (const key in data.bpi) {
+            labels.push(key);
+            values.push(data.bpi[key].rate_float);
           }
-        ]
-      };
-      this.loaded = true;
+
+          this.chartData = {
+            labels: labels,
+            // labels: [
+            //   "January",
+            //   "February",
+            //   "March",
+            //   "April",
+            //   "May",
+            //   "June",
+            //   "July",
+            //   "August",
+            //   "September",
+            //   "October",
+            //   "November",
+            //   "December"
+            // ],
+            datasets: [
+              {
+                label: data.chartName,
+                backgroundColor: "#f87979",
+                // data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
+                data: values,
+              }
+            ]
+          };
+          this.loaded = true;
+        });
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
 }
