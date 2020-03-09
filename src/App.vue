@@ -12,13 +12,15 @@
         </ul>
       </div>
     </header>
-    <div class="container">
+    <div class="container-fluid">
       <router-view />
     </div>
   </div>
 </template>
 
 <style lang="scss">
-@import "~bootstrap";
-@import "~bootstrap-vue";
+  @import "scss/superhero-variables.scss";
+  @import "~bootstrap";
+  @import "~bootstrap-vue";
+  @import "scss/superhero-bootstrap.scss";
 </style>
