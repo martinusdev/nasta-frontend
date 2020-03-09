@@ -1,19 +1,19 @@
 <template>
   <div class="about">
     <h1>Chart test</h1>
-
-    <bar-chart />
+    <test-chart-container />
   </div>
 </template>
 
 <script>
-  // @ is an alias to /src
-  import BarChart from "@/lib/charts/BarChart";
+// @ is an alias to /src
+import TestChartContainer from "@/components/TestChartContainer.vue";
 
-  export default {
-    name: "Home",
-    components: {
-      BarChart
-    }
-  };
+export default {
+  name: "Home",
+  components: {
+    TestChartContainer
+    // BarChart
+  }
+};
 </script>
