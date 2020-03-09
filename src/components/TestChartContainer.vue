@@ -33,8 +33,8 @@ export default class TestChartContainer extends Vue {
       // TODO load data from API or whatever
       // const { userlist } = await fetch('/api/userlist');
 
-      Axios.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-        .then((response) => {
+      Axios.get("https://api.coindesk.com/v1/bpi/currentprice.json").then(
+        response => {
           const data = response.data;
           console.log(data);
 
@@ -66,12 +66,13 @@ export default class TestChartContainer extends Vue {
                 label: data.chartName,
                 backgroundColor: "#f87979",
                 // data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
-                data: values,
+                data: values
               }
             ]
           };
           this.loaded = true;
-        });
+        }
+      );
     } catch (e) {
       // console.error(e);
     }

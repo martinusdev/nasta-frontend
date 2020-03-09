@@ -7,7 +7,6 @@ import Component from "vue-class-component";
 import Vue from "vue";
 import LineChart from "@/lib/charts/LineChart";
 import { ChartData, ChartOptions } from "chart.js";
-import Axios from "axios";
 
 @Component({
   components: {
