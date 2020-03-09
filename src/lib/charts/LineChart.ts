@@ -1,11 +1,11 @@
 import Vue from "vue";
-import { Bar } from "vue-chartjs";
+import { Line } from "vue-chartjs";
 import Component, { mixins } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import { ChartData, ChartOptions } from "chart.js";
 
 @Component
-export default class BarChart extends mixins(Vue, Bar) {
+export default class LineChart extends mixins(Vue, Line) {
   @Prop({ default: null })
   chartData!: ChartData;
 
