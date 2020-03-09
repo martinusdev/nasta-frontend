@@ -13,15 +13,14 @@
 
 <script>
 // @ is an alias to /src
-import TestChartContainer from "@/components/TestChartContainer.vue";
-import TestLineChartContainer from "@/components/TestLineChartContainer.vue";
+import TestChartContainer from '@/components/TestChartContainer.vue';
+import TestLineChartContainer from '@/components/TestLineChartContainer.vue';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     TestChartContainer,
-    TestLineChartContainer
-    // BarChart
-  }
+    TestLineChartContainer,
+  },
 };
 </script>

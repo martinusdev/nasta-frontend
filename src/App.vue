@@ -19,8 +19,8 @@
 </template>
 
 <style lang="scss">
-@import "scss/superhero-variables.scss";
-@import "~bootstrap";
-@import "~bootstrap-vue";
-@import "scss/superhero-bootstrap.scss";
+@import 'scss/superhero-variables.scss';
+@import '~bootstrap';
+@import '~bootstrap-vue';
+@import 'scss/superhero-bootstrap.scss';
 </style>

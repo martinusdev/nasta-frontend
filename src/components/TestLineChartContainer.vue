@@ -3,15 +3,15 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import LineChart from "@/lib/charts/LineChart";
-import { ChartData, ChartOptions } from "chart.js";
+import Component from 'vue-class-component';
+import Vue from 'vue';
+import LineChart from '@/lib/charts/LineChart';
+import { ChartData, ChartOptions } from 'chart.js';
 
 @Component({
   components: {
-    LineChart
-  }
+    LineChart,
+  },
 })
 export default class TestLineChartContainer extends Vue {
   loaded: boolean;
@@ -34,37 +34,37 @@ export default class TestLineChartContainer extends Vue {
         labels: [1, 2, 3, 4],
         datasets: [
           {
-            label: "Ciara",
-            backgroundColor: "#ff0000",
-            borderColor: "#ff0000",
+            label: 'Ciara',
+            backgroundColor: '#ff0000',
+            borderColor: '#ff0000',
             data: [
               {
                 x: 1,
-                y: 5
+                y: 5,
               },
               {
                 x: 2,
-                y: 7
+                y: 7,
               },
               {
                 x: 3,
-                y: 10
+                y: 10,
               },
               {
                 x: 4,
-                y: 15
-              }
-            ]
-          }
-        ]
+                y: 15,
+              },
+            ],
+          },
+        ],
       };
 
       this.options = {
         elements: {
           line: {
-            fill: false
-          }
-        }
+            fill: false,
+          },
+        },
       };
       this.loaded = true;
     } catch (e) {
