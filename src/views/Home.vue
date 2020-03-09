@@ -13,19 +13,14 @@
 
 <script>
 // @ is an alias to /src
-import { listReports } from "@/lib/data/db.ts";
-import TestChartContainer from "@/components/TestChartContainer.vue";
-import TestLineChartContainer from "@/components/TestLineChartContainer.vue";
+import TestChartContainer from '@/components/TestChartContainer.vue';
+import TestLineChartContainer from '@/components/TestLineChartContainer.vue';
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     TestChartContainer,
-    TestLineChartContainer
+    TestLineChartContainer,
   },
-  async mounted() {
-    const reports = await listReports();
-    console.log(reports);
-  }
 };
 </script>

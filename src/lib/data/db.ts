@@ -1,9 +1,9 @@
-import AWS from "aws-sdk";
+import AWS from 'aws-sdk';
 
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = process.env.VUE_APP_ACCESS_KEY_ID;
 AWS.config.secretAccessKey = process.env.VUE_APP_SECRET_ACCESS_KEY;
-AWS.config.region = "eu-central-1";
+AWS.config.region = 'eu-central-1';
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 
@@ -20,7 +20,7 @@ return { error: err };
 
 async function listReports() {
   const params = {
-    TableName: "Reports"
+    TableName: 'Reports',
   };
   try {
     const data = await docClient.scan(params).promise();

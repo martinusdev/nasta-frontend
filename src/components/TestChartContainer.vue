@@ -3,22 +3,21 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import Vue from "vue";
-import BarChart from "@/lib/charts/BarChart";
-import { ChartData, ChartOptions } from "chart.js";
-import Axios from "axios";
+import Component from 'vue-class-component';
+import Vue from 'vue';
+import BarChart from '@/lib/charts/BarChart';
+import { ChartData, ChartOptions } from 'chart.js';
+import { listReports } from '@/lib/data/db.ts';
 
 @Component({
   components: {
-    BarChart
-  }
+    BarChart,
+  },
 })
 export default class TestChartContainer extends Vue {
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
-
   constructor() {
     super();
 
@@ -26,55 +25,39 @@ export default class TestChartContainer extends Vue {
     this.chartData = {};
     this.options = {};
   }
-
   async mounted() {
-    this.loaded = false;
+    this.loadData();
+  }
+  async loadData() {
+    // TODO Este toto cele by sme mali zabalit do nejakej funkcie
     try {
-      // TODO load data from API or whatever
-      // const { userlist } = await fetch('/api/userlist');
-
-      Axios.get("https://api.coindesk.com/v1/bpi/currentprice.json").then(
-        response => {
-          const data = response.data;
-          console.log(data);
-
-          const labels: string[] = [];
-          const values: number[] = [];
-          for (const key in data.bpi) {
-            labels.push(key);
-            values.push(data.bpi[key].rate_float);
-          }
-
-          this.chartData = {
-            labels: labels,
-            // labels: [
-            //   "January",
-            //   "February",
-            //   "March",
-            //   "April",
-            //   "May",
-            //   "June",
-            //   "July",
-            //   "August",
-            //   "September",
-            //   "October",
-            //   "November",
-            //   "December"
-            // ],
-            datasets: [
-              {
-                label: data.chartName,
-                backgroundColor: "#f87979",
-                // data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
-                data: values
-              }
-            ]
-          };
-          this.loaded = true;
-        }
-      );
+      const reports = await listReports();
+      const labels: string[] = [];
+      const values: number[] = [];
+      // Potom by sa to aj hodilo niekam presunut, tu to urcite nema byt.
+      interface ReportItem {
+        Name: string;
+        Value: number;
+        Timestamp: number;
+      }
+      const reportItems: ReportItem[] = reports.Items;
+      for (const key in reportItems) {
+        labels.push(reportItems[key].Name);
+        values.push(reportItems[key].Value);
+      }
+      this.chartData = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Values',
+            backgroundColor: '#f87979',
+            data: values,
+          },
+        ],
+      };
+      this.loaded = true;
     } catch (e) {
-      // console.error(e);
+      console.error(e);
     }
   }
 }
