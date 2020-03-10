@@ -25,10 +25,27 @@ export default class ErrorRateChart extends Vue {
 
     this.loaded = false;
     this.chartData = {};
-    this.options = {};
+
+    this.options = {
+      elements: {
+        line: {
+          fill: false,
+          borderColor: '#f87979',
+          borderWidth: 2,
+        },
+        point: {
+          radius: 0,
+        },
+      },
+    };
   }
   async mounted() {
+    console.log('mounted');
     this.loadData();
+
+    setInterval(() => {
+      this.loadData();
+    }, 5000);
   }
   async loadData() {
     // TODO Este toto cele by sme mali zabalit do nejakej funkcie
@@ -36,7 +53,6 @@ export default class ErrorRateChart extends Vue {
       const filterTime = moment('2020-03-09 08:20:00');
       const endTime = filterTime.unix();
       const startTime = filterTime.subtract(1, 'hour').unix();
-      console.log(filterTime);
 
       const reports = await getReports(
         'nr_error_rate_martinus',
@@ -46,8 +62,6 @@ export default class ErrorRateChart extends Vue {
           ':endtime': endTime,
         },
       );
-
-      console.log(reports);
 
       const labels: string[] = [];
       const values: number[] = [];
@@ -68,12 +82,8 @@ export default class ErrorRateChart extends Vue {
           .unix(reportItems[key].report_time)
           .format('m');
 
-        console.log(Math.round(minutes / 5) * 5);
-
         values[Math.round(minutes / 5)] = reportItems[key].report_value;
       }
-
-      console.log(values);
 
       this.chartData = {
         labels: labels,
@@ -81,24 +91,11 @@ export default class ErrorRateChart extends Vue {
           {
             spanGaps: false,
             lineTension: 0,
-            label: 'Error rate',
+            label: 'Error rate ' + now.format('YYYY-MM-DD HH:mm:ss'),
             backgroundColor: '#f87979',
             data: values,
           },
         ],
-      };
-
-      this.options = {
-        elements: {
-          line: {
-            fill: false,
-            borderColor: '#f87979',
-            borderWidth: 2,
-          },
-          point: {
-            radius: 0,
-          },
-        },
       };
 
       this.loaded = true;
