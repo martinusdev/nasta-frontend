@@ -40,7 +40,6 @@ export default class ErrorRateChart extends Vue {
     };
   }
   async mounted() {
-    console.log('mounted');
     this.loadData();
 
     setInterval(() => {
@@ -100,7 +99,7 @@ export default class ErrorRateChart extends Vue {
 
       this.loaded = true;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
 }
