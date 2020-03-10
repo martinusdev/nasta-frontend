@@ -13,7 +13,7 @@ cd docs
 # echo 'www.example.com' > CNAME
 
 # git init
-git add -A
+git add --all :/
 git commit -m 'deploy'
 
 # if you are deploying to https://<USERNAME>.github.io
