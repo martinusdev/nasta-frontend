@@ -1,9 +1,17 @@
 <template>
-  <line-chart v-if="loaded" :chartData="chartData" :options="options" />
+  <div>
+    <small>
+      Interval:
+      <input type="range" min="30" max="1440" v-model="spanInMinutes" />
+      {{ spanInMinutes }} minutes
+    </small>
+    <line-chart v-if="loaded" :chartData="chartData" :options="options" />
+  </div>
 </template>
 
 <script lang="ts">
 import Component from 'vue-class-component';
+import { Watch } from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -20,11 +28,15 @@ export default class ErrorRateChart extends Vue {
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
+  spanInMinutes: number;
+  defaultSpanInMinutes: number;
   constructor() {
     super();
 
     this.loaded = false;
     this.chartData = {};
+    this.defaultSpanInMinutes = 60;
+    this.spanInMinutes = this.defaultSpanInMinutes;
 
     this.options = {
       legend: {
@@ -65,7 +77,7 @@ export default class ErrorRateChart extends Vue {
 
     setInterval(() => {
       this.loadData();
-    }, 5000);
+    }, 60000);
   }
   async loadData() {
     // TODO Este toto cele by sme mali zabalit do nejakej funkcie
@@ -73,7 +85,9 @@ export default class ErrorRateChart extends Vue {
       // const filterTime = moment('2020-03-09 08:20:00');
       const filterTime = moment();
       const endTime = filterTime.unix();
-      const startTime = filterTime.subtract(1, 'hour').unix();
+      const startTime = filterTime
+        .subtract(this.$data.spanInMinutes, 'minute')
+        .unix();
 
       const reports = await getReports(
         'error_rate_martinus',
@@ -87,14 +101,27 @@ export default class ErrorRateChart extends Vue {
       const labels: string[] = [];
       const values: number[] = [];
 
-      let now = moment();
-      now = now.minute(Math.round(now.minute() / 5) * 5);
-      now = now.subtract(60, 'minute');
+      const startingPoint = moment().subtract(
+        // Tu bacha lebo das opacne tieto argumenty a spravi string concat.
+        // Asi som mu nepovedal dost dobre, ze spanInMinutes je number.
+        // A mozno mu to je jedno.
+        (moment().minute() % 5) + parseInt(this.$data.spanInMinutes, 10),
+        'minute',
+      );
+      console.log('Graf od ', startingPoint.format());
 
-      for (let i = 0; i < 12; i++) {
+      // Toto 12 je len proste 12 labels na x-ovej osi?
+      const pointsCount = 12;
+      const minutesIncrement = Math.round(
+        parseInt(this.$data.spanInMinutes, 10) / pointsCount,
+      );
+      console.log(minutesIncrement);
+      for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
 
-        labels.push(now.add(5, 'minute').format('HH:mm'));
+        labels.push(
+          startingPoint.add(minutesIncrement, 'minute').format('HH:mm'),
+        );
       }
 
       const reportItems: ReportItem[] = reports.Items;
@@ -103,16 +130,17 @@ export default class ErrorRateChart extends Vue {
           .unix(reportItems[key].report_time)
           .format('m');
 
-        values[Math.round(minutes / 5)] = reportItems[key].report_value;
+        values[Math.round(minutes / minutesIncrement)] =
+          reportItems[key].report_value;
       }
 
       this.chartData = {
-        labels: labels,
+        labels,
         datasets: [
           {
             spanGaps: false,
             lineTension: 0,
-            label: 'Error rate ' + now.format('YYYY-MM-DD HH:mm:ss'),
+            label: 'Error rate ' + startingPoint.format('YYYY-MM-DD HH:mm:ss'),
             backgroundColor: '#f87979',
             data: values,
           },
@@ -123,6 +151,10 @@ export default class ErrorRateChart extends Vue {
     } catch (e) {
       // console.error(e);
     }
+  }
+  @Watch('spanInMinutes')
+  onPropertyChanged() {
+    this.loadData();
   }
 }
 </script>
