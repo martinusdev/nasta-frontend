@@ -2,7 +2,7 @@
   <div class="about">
     <div class="row">
       <div class="col-sm">
-        <test-chart-container />
+        <error-rate-chart />
       </div>
       <div class="col-sm">
         <test-line-chart-container />
@@ -13,13 +13,13 @@
 
 <script>
 // @ is an alias to /src
-import TestChartContainer from '@/components/TestChartContainer.vue';
+import ErrorRateChart from '@/components/ErrorRateChart.vue';
 import TestLineChartContainer from '@/components/TestLineChartContainer.vue';
 
 export default {
   name: 'Home',
   components: {
-    TestChartContainer,
+    ErrorRateChart,
     TestLineChartContainer,
   },
 };
