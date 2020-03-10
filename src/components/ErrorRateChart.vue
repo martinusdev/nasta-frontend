@@ -76,7 +76,7 @@ export default class ErrorRateChart extends Vue {
       const startTime = filterTime.subtract(1, 'hour').unix();
 
       const reports = await getReports(
-        'nr_error_rate_martinus',
+        'error_rate_martinus',
         'report_time between :starttime and :endtime',
         {
           ':starttime': startTime,
