@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
-import moment from "moment";
+import moment from 'moment';
+import { ReportItem } from '@/lib/data/types.ts';
 
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = process.env.VUE_APP_ACCESS_KEY_ID;
@@ -7,12 +8,6 @@ AWS.config.secretAccessKey = process.env.VUE_APP_SECRET_ACCESS_KEY;
 AWS.config.region = 'eu-central-1';
 
 const docClient = new AWS.DynamoDB.DocumentClient();
-
-interface ReportItem {
-  report_name: string;
-  report_value: number;
-  report_time: number;
-}
 
 /*
 Usage:
@@ -31,12 +26,15 @@ return { error: err };
 async function listReports() {
   const params = {
     TableName: 'Reports',
-    FilterExpression: 'report_name = :row_name and report_time between :starttime and :endtime',
-    ExpressionAttributeValues : {
+    FilterExpression:
+      'report_name = :row_name and report_time between :starttime and :endtime',
+    ExpressionAttributeValues: {
       ':row_name': 'nr_error_rate_martinus',
-      ':starttime': moment().subtract(1, 'hour').unix(),
+      ':starttime': moment()
+        .subtract(1, 'hour')
+        .unix(),
       ':endtime': moment().unix(),
-    }
+    },
   };
   try {
     const data = await docClient.scan(params).promise();
@@ -46,14 +44,18 @@ async function listReports() {
   }
 }
 
-async function getReports(rowName: string, filterExpression: string, expressionAttributeValues: {[key: string]: any}) {
+async function getReports(
+  rowName: string,
+  filterExpression: string,
+  expressionAttributeValues: { [key: string]: any },
+) {
   filterExpression = 'report_name = :row_name and ' + filterExpression;
   expressionAttributeValues[':row_name'] = rowName;
 
   const params = {
     TableName: 'Reports',
     FilterExpression: filterExpression,
-    ExpressionAttributeValues : expressionAttributeValues
+    ExpressionAttributeValues: expressionAttributeValues,
   };
   try {
     return await docClient.scan(params).promise();

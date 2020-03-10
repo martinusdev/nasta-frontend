@@ -5,10 +5,11 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import Vue from 'vue';
-import { ChartData, ChartOptions } from 'chart.js';
-import { getReports, ReportItem } from '@/lib/data/db.ts';
-import LineChart from '@/lib/charts/LineChart';
 import moment from 'moment';
+import { ChartData, ChartOptions } from 'chart.js';
+import { getReports } from '@/lib/data/db.ts';
+import { ReportItem } from '@/lib/data/types.ts';
+import LineChart from '@/lib/charts/LineChart';
 
 @Component({
   components: {
