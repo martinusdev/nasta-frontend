@@ -27,6 +27,27 @@ export default class ErrorRateChart extends Vue {
     this.chartData = {};
 
     this.options = {
+      legend: {
+        labels: {
+          fontColor: 'white',
+        },
+      },
+      scales: {
+        xAxes: [
+          {
+            ticks: {
+              fontColor: 'white',
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ticks: {
+              fontColor: 'white',
+            },
+          },
+        ],
+      },
       elements: {
         line: {
           fill: false,
@@ -49,7 +70,8 @@ export default class ErrorRateChart extends Vue {
   async loadData() {
     // TODO Este toto cele by sme mali zabalit do nejakej funkcie
     try {
-      const filterTime = moment('2020-03-09 08:20:00');
+      // const filterTime = moment('2020-03-09 08:20:00');
+      const filterTime = moment();
       const endTime = filterTime.unix();
       const startTime = filterTime.subtract(1, 'hour').unix();
 
