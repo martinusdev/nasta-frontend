@@ -19,7 +19,8 @@
           </div>
         </div>
       </form>
-      <line-chart
+      <v-component
+        :is="chartComponent"
         v-if="loaded"
         :chartData="chartData"
         :options="options"
@@ -35,29 +36,38 @@ import { Watch, Prop } from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
-import { getReports } from '@/lib/data/db.ts';
+import { getReports } from '@/lib/data/api.ts';
 import { ReportItem } from '@/lib/data/types.ts';
 import LineChart from '@/lib/charts/LineChart';
+import BarChart from '@/lib/charts/BarChart';
+
+enum ChartType {
+  'bar',
+  'line',
+}
 
 @Component({
   components: {
     LineChart,
+    BarChart,
   },
 })
 export default class ErrorRateChart extends Vue {
   @Prop({ default: 'error_rate_martinus' })
   reportName!: string;
+  @Prop({ default: 'line' })
+  chartType!: ChartType;
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
   spanInMinutes: number;
-  defaultSpanInMinutes: number;
+  @Prop({ default: 60 })
+  defaultSpanInMinutes!: number;
   constructor() {
     super();
 
     this.loaded = false;
     this.chartData = {};
-    this.defaultSpanInMinutes = 60;
     this.spanInMinutes = this.defaultSpanInMinutes;
 
     this.options = {
@@ -112,9 +122,7 @@ export default class ErrorRateChart extends Vue {
     }, 60000);
   }
   async loadData() {
-    // TODO Este toto cele by sme mali zabalit do nejakej funkcie
     try {
-      // const filterTime = moment('2020-03-09 08:20:00');
       const filterTime = moment();
       const endTime = filterTime.unix();
       const startTime = filterTime.subtract(this.span, 'minute').unix();
@@ -123,8 +131,8 @@ export default class ErrorRateChart extends Vue {
         this.$props.reportName,
         'report_time between :starttime and :endtime',
         {
-          ':starttime': startTime,
-          ':endtime': endTime,
+          ':starttime': { N: `${startTime}` },
+          ':endtime': { N: `${endTime}` },
         },
       );
 
@@ -170,7 +178,7 @@ export default class ErrorRateChart extends Vue {
 
       this.loaded = true;
     } catch (e) {
-      // console.error(e);
+      console.error(e);
     }
   }
   @Watch('spanInMinutes')
@@ -182,6 +190,9 @@ export default class ErrorRateChart extends Vue {
   }
   get spanHumanized() {
     return moment.duration(this.span, 'minute').humanize();
+  }
+  get chartComponent() {
+    return `${this.$props.chartType}-chart`;
   }
 }
 </script>
