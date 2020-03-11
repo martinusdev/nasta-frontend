@@ -2,7 +2,9 @@
   <div class="col-sm">
     <div>
       <form class="form-inline">
-        <label class="col-sm-1 col-form-label col-form-label-sm">Interval:</label>
+        <label class="col-sm-1 col-form-label col-form-label-sm"
+          >Interval:</label
+        >
         <div class="input-group">
           <input
             class="form-control-sm"
