@@ -138,8 +138,6 @@ export default class FCPHomepageChart extends Vue {
         },
       );
 
-      console.log(reports);
-
       const labels: string[] = [];
       const values: BarChartData[] = [
         {
