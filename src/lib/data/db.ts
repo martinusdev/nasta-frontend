@@ -44,7 +44,7 @@ async function listReports() {
   }
 }
 
-async function getReports(
+async function getReportsByRowName(
   rowName: string,
   filterExpression: string,
   expressionAttributeValues: { [key: string]: any },
@@ -64,4 +64,20 @@ async function getReports(
   }
 }
 
-export { listReports, getReports, ReportItem };
+async function getReports(
+  filterExpression: string,
+  expressionAttributeValues: { [key: string]: any },
+) {
+  const params = {
+    TableName: 'Reports',
+    FilterExpression: filterExpression,
+    ExpressionAttributeValues: expressionAttributeValues,
+  };
+  try {
+    return await docClient.scan(params).promise();
+  } catch (err) {
+    return err;
+  }
+}
+
+export { listReports, getReportsByRowName, getReports, ReportItem };

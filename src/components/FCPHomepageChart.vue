@@ -9,17 +9,17 @@
           <input
             class="form-control-sm"
             type="range"
-            min="30"
-            max="1440"
-            step="30"
-            v-model="spanInMinutes"
+            min="1"
+            max="14"
+            step="1"
+            v-model="spanInDays"
           />
           <div class="form-control-sm">
             <span>{{ spanHumanized }}</span>
           </div>
         </div>
       </form>
-      <line-chart
+      <bar-chart
         v-if="loaded"
         :chartData="chartData"
         :options="options"
@@ -31,34 +31,33 @@
 
 <script lang="ts">
 import Component from 'vue-class-component';
-import { Watch, Prop } from 'vue-property-decorator';
+import { Watch } from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
-import { getReportsByRowName } from '@/lib/data/db.ts';
+import { getReports } from '@/lib/data/db.ts';
 import { ReportItem } from '@/lib/data/types.ts';
-import LineChart from '@/lib/charts/LineChart';
+import BarChart from '@/lib/charts/BarChart';
+import { BarChartData } from '@/lib/data/types';
 
 @Component({
   components: {
-    LineChart,
+    BarChart,
   },
 })
-export default class ErrorRateChart extends Vue {
-  @Prop({ default: 'error_rate_martinus' })
-  reportName!: string;
+export default class FCPHomepageChart extends Vue {
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
-  spanInMinutes: number;
-  defaultSpanInMinutes: number;
+  spanInDays: number;
+  defaultSpanInDays: number;
   constructor() {
     super();
 
     this.loaded = false;
     this.chartData = {};
-    this.defaultSpanInMinutes = 60;
-    this.spanInMinutes = this.defaultSpanInMinutes;
+    this.defaultSpanInDays = 1;
+    this.spanInDays = this.defaultSpanInDays;
 
     this.options = {
       legend: {
@@ -72,7 +71,6 @@ export default class ErrorRateChart extends Vue {
             ticks: {
               fontColor: 'white',
               autoSkip: true,
-              maxTicksLimit: 12,
             },
           },
         ],
@@ -112,60 +110,90 @@ export default class ErrorRateChart extends Vue {
     }, 60000);
   }
   async loadData() {
-    // TODO Este toto cele by sme mali zabalit do nejakej funkcie
     try {
-      // const filterTime = moment('2020-03-09 08:20:00');
       const filterTime = moment();
-      const endTime = filterTime.unix();
-      const startTime = filterTime.subtract(this.span, 'minute').unix();
+      const endTime = filterTime
+        .clone()
+        .hour(23)
+        .minute(59)
+        .unix();
+      const startTime = filterTime
+        .subtract(this.span, 'days')
+        .hour(0)
+        .minute(0)
+        .unix();
 
-      const reports = await getReportsByRowName(
-        this.$props.reportName,
-        'report_time between :starttime and :endtime',
+      const reportNames = [':rn1', ':rn2', ':rn3'];
+
+      const reports = await getReports(
+        'report_name IN (' +
+          reportNames.toString() +
+          ') and report_time between :starttime and :endtime',
         {
           ':starttime': startTime,
           ':endtime': endTime,
+          ':rn1': 'fcp_home_page_tablet',
+          ':rn2': 'fcp_home_page_desktop',
+          ':rn3': 'fcp_home_page_mobile',
         },
       );
 
-      const labels: string[] = [];
-      const values: number[] = [];
+      console.log(reports);
 
-      let now = moment();
-      now = now.minute(Math.round(now.minute() / 5) * 5);
-      const startPoint = now.clone().subtract(this.span, 'minute');
+      const labels: string[] = [];
+      const values: BarChartData[] = [
+        {
+          label: 'HP Tablet',
+          backgroundColor: '#00aa00',
+          data: [],
+        },
+        {
+          label: 'HP Desktop',
+          backgroundColor: '#d37778',
+          data: [],
+        },
+        {
+          label: 'HP Mobile',
+          backgroundColor: '#5e7cff',
+          data: [],
+        },
+      ];
+
+      const now = moment();
+      const startPoint = now.clone().subtract(this.span, 'days');
 
       const endPoint = startPoint.clone();
 
       const pointsCount = this.span;
       for (let i = 0; i < pointsCount; i++) {
-        values.push(NaN);
-        labels.push(endPoint.add(1, 'minute').format('HH:mm'));
+        labels.push(endPoint.add(1, 'day').format('DD.MM.'));
       }
 
       const reportItems: ReportItem[] = reports.Items;
       for (const key in reportItems) {
-        const minutes: number = moment
+        const days: number = moment
           .unix(reportItems[key].report_time)
-          .diff(startPoint, 'minutes');
+          .diff(startPoint, 'days');
 
-        if (minutes >= 0) {
-          values[minutes] = reportItems[key].report_value / 10;
+        const reportName = reportItems[key].report_name;
+        if (days >= 0) {
+          switch (reportName) {
+            case 'fcp_home_page_tablet':
+              values[0].data[days] = reportItems[key].report_value;
+              break;
+            case 'fcp_home_page_desktop':
+              values[1].data[days] = reportItems[key].report_value;
+              break;
+            case 'fcp_home_page_mobile':
+              values[2].data[days] = reportItems[key].report_value;
+              break;
+          }
         }
       }
 
-      const label = `${this.$props.reportName} ${this.spanHumanized}`;
       this.chartData = {
         labels,
-        datasets: [
-          {
-            spanGaps: false,
-            lineTension: 0,
-            label,
-            backgroundColor: '#f87979',
-            data: values,
-          },
-        ],
+        datasets: values,
       };
 
       this.loaded = true;
@@ -178,10 +206,10 @@ export default class ErrorRateChart extends Vue {
     this.loadData();
   }
   get span(): number {
-    return parseInt(this.$data.spanInMinutes, 10);
+    return parseInt(this.$data.spanInDays, 10);
   }
   get spanHumanized() {
-    return moment.duration(this.span, 'minute').humanize();
+    return moment.duration(this.span, 'days').humanize();
   }
 }
 </script>
