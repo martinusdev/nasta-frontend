@@ -2,7 +2,13 @@
   <div>
     <small>
       Interval:
-      <input type="range" min="30" max="1440" v-model="spanInMinutes" />
+      <input
+        type="range"
+        min="30"
+        max="1440"
+        step="30"
+        v-model="spanInMinutes"
+      />
       {{ spanInMinutes }} minutes
     </small>
     <line-chart v-if="loaded" :chartData="chartData" :options="options" />
@@ -108,14 +114,14 @@ export default class ErrorRateChart extends Vue {
         (moment().minute() % 5) + parseInt(this.$data.spanInMinutes, 10),
         'minute',
       );
-      console.log('Graf od ', startingPoint.format());
+      // console.log('Graf od ', startingPoint.format());
 
-      // Toto 12 je len proste 12 labels na x-ovej osi?
+      // Toto 12 je len proste 12 labels na x-ovej osi? -> ano, lebo povodne bolo 60 minut kazdych 5 minut = 12
       const pointsCount = 12;
       const minutesIncrement = Math.round(
         parseInt(this.$data.spanInMinutes, 10) / pointsCount,
       );
-      console.log(minutesIncrement);
+      // console.log(minutesIncrement);
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
 
