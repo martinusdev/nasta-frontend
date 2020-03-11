@@ -15,7 +15,7 @@
             v-model="spanInMinutes"
           />
           <div class="form-control-sm">
-            <span>{{ spanInMinutes }} minutes</span>
+            <span>{{ spanHumanized }}</span>
           </div>
         </div>
       </form>
@@ -100,9 +100,7 @@ export default class ErrorRateChart extends Vue {
       // const filterTime = moment('2020-03-09 08:20:00');
       const filterTime = moment();
       const endTime = filterTime.unix();
-      const startTime = filterTime
-        .subtract(this.$data.spanInMinutes, 'minute')
-        .unix();
+      const startTime = filterTime.subtract(this.span, 'minute').unix();
 
       const reports = await getReports(
         'error_rate_martinus',
@@ -118,13 +116,11 @@ export default class ErrorRateChart extends Vue {
 
       let now = moment();
       now = now.minute(Math.round(now.minute() / 5) * 5);
-      const startPoint = now
-        .clone()
-        .subtract(this.$data.spanInMinutes, 'minute');
+      const startPoint = now.clone().subtract(this.span, 'minute');
 
       const endPoint = startPoint.clone();
 
-      const pointsCount = Math.round(this.$data.spanInMinutes / 5);
+      const pointsCount = Math.round(this.span / 5);
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
 
@@ -142,13 +138,16 @@ export default class ErrorRateChart extends Vue {
         }
       }
 
+      const label = `Error rate ${startPoint.format(
+        'YYYY-MM-DD HH:mm',
+      )} - ${endPoint.format('MM-DD HH:mm')}`;
       this.chartData = {
         labels,
         datasets: [
           {
             spanGaps: false,
             lineTension: 0,
-            label: 'Error rate ' + endPoint.format('YYYY-MM-DD HH:mm:ss'),
+            label,
             backgroundColor: '#f87979',
             data: values,
           },
@@ -163,6 +162,12 @@ export default class ErrorRateChart extends Vue {
   @Watch('spanInMinutes')
   onPropertyChanged() {
     this.loadData();
+  }
+  get span(): number {
+    return parseInt(this.$data.spanInMinutes, 10);
+  }
+  get spanHumanized() {
+    return moment.duration(this.span, 'minute').humanize();
   }
 }
 </script>
