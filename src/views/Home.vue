@@ -1,12 +1,10 @@
 <template>
-  <div class="about">
-    <div class="row">
-      <div class="col-sm">
-        <error-rate-chart />
-      </div>
-      <div class="col-sm">
-        <test-line-chart-container />
-      </div>
+  <div class="row about">
+    <div class="col-sm">
+      <error-rate-chart />
+    </div>
+    <div class="col-sm">
+      <test-line-chart-container />
     </div>
   </div>
 </template>
