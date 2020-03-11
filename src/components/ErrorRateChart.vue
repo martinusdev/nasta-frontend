@@ -178,7 +178,7 @@ export default class ErrorRateChart extends Vue {
 
       this.loaded = true;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
   @Watch('spanInMinutes')

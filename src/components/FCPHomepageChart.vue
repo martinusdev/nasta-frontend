@@ -196,7 +196,7 @@ export default class FCPHomepageChart extends Vue {
 
       this.loaded = true;
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }
   @Watch('spanInDays')
