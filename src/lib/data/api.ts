@@ -12,13 +12,13 @@ function unmarshall(data: any) {
 }
 
 export async function getReports(
-  FilterExpression: string,
-  ExpressionAttributeValues: any,
+    filterExpression: string,
+    expressionAttributeValues: { [key: string]: any},
 ) {
   const params = {
     TableName: 'Reports',
-    FilterExpression,
-    ExpressionAttributeValues,
+    FilterExpression: filterExpression,
+    ExpressionAttributeValues: expressionAttributeValues,
   };
 
   try {

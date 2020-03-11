@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import {Prop, Watch} from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -45,12 +45,16 @@ import { BarChartData } from '@/lib/data/types';
     BarChart,
   },
 })
-export default class FCPHomepageChart extends Vue {
+export default class FCPChart extends Vue {
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
   spanInDays: number;
   defaultSpanInDays: number;
+
+  public reportNames!: string[];
+  public values!: Map<string, BarChartData>;
+
   constructor() {
     super();
 
@@ -58,6 +62,8 @@ export default class FCPHomepageChart extends Vue {
     this.chartData = {};
     this.defaultSpanInDays = 1;
     this.spanInDays = this.defaultSpanInDays;
+    this.reportNames = [];
+    this.values = new Map();
 
     this.options = {
       legend: {
@@ -123,39 +129,34 @@ export default class FCPHomepageChart extends Vue {
         .minute(0)
         .unix();
 
-      const reportNames = [':rn1', ':rn2', ':rn3'];
+      let index = 0;
+      const reportParams = new Map();
+      const reportIndexes: string[] = [];
+      this.reportNames.forEach((value: string) => {
+        index++;
+        reportParams.set(':rn' + index, { S: value });
+        reportIndexes.push(':rn' + index);
+      });
+
+      const expressionParams = reportParams;
+      expressionParams.set(':starttime', { N: `${startTime}` });
+      expressionParams.set(':endtime', { N: `${endTime}` });
+
+      const exParamsObject: any = {};
+      expressionParams.forEach((value: any, key: string) => {
+        exParamsObject[key] = value;
+      });
 
       const reports = await getReports(
         'report_name IN (' +
-          reportNames.toString() +
+          reportIndexes.toString() +
           ') and report_time between :starttime and :endtime',
-        {
-          ':starttime': { N: `${startTime}` },
-          ':endtime': { N: `${endTime}` },
-          ':rn1': { S: 'fcp_home_page_tablet' },
-          ':rn2': { S: 'fcp_home_page_desktop' },
-          ':rn3': { S: 'fcp_home_page_mobile' },
-        },
+        exParamsObject,
       );
 
+      console.log(reports);
+
       const labels: string[] = [];
-      const values: BarChartData[] = [
-        {
-          label: 'HP Tablet',
-          backgroundColor: '#00aa00',
-          data: [],
-        },
-        {
-          label: 'HP Desktop',
-          backgroundColor: '#d37778',
-          data: [],
-        },
-        {
-          label: 'HP Mobile',
-          backgroundColor: '#5e7cff',
-          data: [],
-        },
-      ];
 
       const now = moment();
       const startPoint = now.clone().subtract(this.span, 'days');
@@ -175,23 +176,23 @@ export default class FCPHomepageChart extends Vue {
 
         const reportName = reportItems[key].report_name;
         if (days >= 0) {
-          switch (reportName) {
-            case 'fcp_home_page_tablet':
-              values[0].data[days] = reportItems[key].report_value;
-              break;
-            case 'fcp_home_page_desktop':
-              values[1].data[days] = reportItems[key].report_value;
-              break;
-            case 'fcp_home_page_mobile':
-              values[2].data[days] = reportItems[key].report_value;
-              break;
+          const dataValue = this.values.get(reportName);
+          if (dataValue) {
+            console.log(days);
+            dataValue.data[days] = reportItems[key].report_value;
+            this.values.set(reportName, dataValue);
           }
         }
       }
 
+      const mapValues: BarChartData[] = [];
+      this.values.forEach((val) => {
+        mapValues.push(val);
+      });
+
       this.chartData = {
         labels,
-        datasets: values,
+        datasets: mapValues,
       };
 
       this.loaded = true;
