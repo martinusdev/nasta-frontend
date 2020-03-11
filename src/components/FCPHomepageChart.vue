@@ -35,7 +35,7 @@ import { Watch } from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
-import { getReports } from '@/lib/data/db.ts';
+import { getReports } from '@/lib/data/api.ts';
 import { ReportItem } from '@/lib/data/types.ts';
 import BarChart from '@/lib/charts/BarChart';
 import { BarChartData } from '@/lib/data/types';
@@ -130,11 +130,11 @@ export default class FCPHomepageChart extends Vue {
           reportNames.toString() +
           ') and report_time between :starttime and :endtime',
         {
-          ':starttime': startTime,
-          ':endtime': endTime,
-          ':rn1': 'fcp_home_page_tablet',
-          ':rn2': 'fcp_home_page_desktop',
-          ':rn3': 'fcp_home_page_mobile',
+          ':starttime': { N: `${startTime}` },
+          ':endtime': { N: `${endTime}` },
+          ':rn1': { S: 'fcp_home_page_tablet' },
+          ':rn2': { S: 'fcp_home_page_desktop' },
+          ':rn3': { S: 'fcp_home_page_mobile' },
         },
       );
 
@@ -196,7 +196,7 @@ export default class FCPHomepageChart extends Vue {
 
       this.loaded = true;
     } catch (e) {
-      // console.error(e);
+      console.error(e);
     }
   }
   @Watch('spanInDays')

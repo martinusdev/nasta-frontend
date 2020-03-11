@@ -12,6 +12,7 @@
     "@types/chart.js": "^2.9.15",
     "@types/node": "^13.9.0",
     "aws-sdk": "^2.635.0",
+    "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.6.1",
     "chart.js": "^2.9.3",
