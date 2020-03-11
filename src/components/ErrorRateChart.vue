@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Component from 'vue-class-component';
-import { Watch } from 'vue-property-decorator';
+import { Watch, Prop } from 'vue-property-decorator';
 import Vue from 'vue';
 import moment from 'moment';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -40,6 +40,8 @@ import LineChart from '@/lib/charts/LineChart';
   },
 })
 export default class ErrorRateChart extends Vue {
+  @Prop({ default: 'error_rate_martinus' })
+  reportName!: string;
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
@@ -103,7 +105,7 @@ export default class ErrorRateChart extends Vue {
       const startTime = filterTime.subtract(this.span, 'minute').unix();
 
       const reports = await getReports(
-        'error_rate_martinus',
+        this.$props.reportName,
         'report_time between :starttime and :endtime',
         {
           ':starttime': startTime,
@@ -138,9 +140,7 @@ export default class ErrorRateChart extends Vue {
         }
       }
 
-      const label = `Error rate ${startPoint.format(
-        'YYYY-MM-DD HH:mm',
-      )} - ${endPoint.format('MM-DD HH:mm')}`;
+      const label = `${this.$props.reportName} ${this.spanHumanized}`;
       this.chartData = {
         labels,
         datasets: [

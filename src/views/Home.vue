@@ -1,7 +1,7 @@
 <template>
   <div class="row about">
-    <error-rate-chart />
-    <error-rate-chart />
+    <error-rate-chart reportName="error_rate_martinus" />
+    <error-rate-chart reportName="response_time_pda" />
     <div class="col-sm">
       <test-line-chart-container />
     </div>
