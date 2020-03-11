@@ -10,3 +10,9 @@ export interface AnotherType {
   report_value: number;
   report_time: number;
 }
+
+export interface BarChartData {
+  label: string;
+  backgroundColor: string;
+  data: number[];
+}
