@@ -12,16 +12,9 @@ function unmarshall(data: any) {
 }
 
 export async function getReports(
-  rowName: string,
-  filterExpression: string,
-  expressionAttributeValues: { [key: string]: any },
+  FilterExpression: string,
+  ExpressionAttributeValues: any,
 ) {
-  const FilterExpression = 'report_name = :row_name and ' + filterExpression;
-  const ExpressionAttributeValues = {
-    ':row_name': { S: rowName },
-    ...expressionAttributeValues,
-  };
-
   const params = {
     TableName: 'Reports',
     FilterExpression,
@@ -35,4 +28,17 @@ export async function getReports(
   } catch (err) {
     return err;
   }
+}
+
+export async function getReportsByRowName(
+  rowName: string,
+  filterExpression: string,
+  expressionAttributeValues: { [key: string]: any },
+) {
+  const FilterExpression = 'report_name = :row_name and ' + filterExpression;
+  const ExpressionAttributeValues = {
+    ':row_name': { S: rowName },
+    ...expressionAttributeValues,
+  };
+  return getReports(FilterExpression, ExpressionAttributeValues);
 }
