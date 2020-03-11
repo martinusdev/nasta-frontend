@@ -1,9 +1,7 @@
 <template>
   <div class="row about">
     <error-rate-chart />
-    <div class="col-sm">
-      <test-line-chart-container />
-    </div>
+    <error-rate-chart />
     <div class="col-sm">
       <test-line-chart-container />
     </div>
