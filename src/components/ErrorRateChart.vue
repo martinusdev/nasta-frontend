@@ -1,26 +1,24 @@
 <template>
   <div class="col-sm">
-    <form>
-      <div class="form-group row">
+    <div>
+      <form class="form-inline">
         <label class="col-sm-1 col-form-label col-form-label-sm">Interval:</label>
-        <div class="col-sm-4">
-          <div class="input-group mb-2">
-            <input
-              class="form-control-sm"
-              type="range"
-              min="30"
-              max="1440"
-              step="30"
-              v-model="spanInMinutes"
-            />
-            <div class="form-control-sm">
-              <span>{{ spanInMinutes }} minutes</span>
-            </div>
+        <div class="input-group">
+          <input
+            class="form-control-sm"
+            type="range"
+            min="30"
+            max="1440"
+            step="30"
+            v-model="spanInMinutes"
+          />
+          <div class="form-control-sm">
+            <span>{{ spanInMinutes }} minutes</span>
           </div>
         </div>
-      </div>
+      </form>
       <line-chart v-if="loaded" :chartData="chartData" :options="options" />
-    </form>
+    </div>
   </div>
 </template>
 
@@ -77,7 +75,7 @@ export default class ErrorRateChart extends Vue {
       },
       elements: {
         line: {
-          fill: false,
+          fill: true,
           borderColor: '#f87979',
           borderWidth: 2,
         },

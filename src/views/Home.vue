@@ -4,6 +4,12 @@
     <div class="col-sm">
       <test-line-chart-container />
     </div>
+    <div class="col-sm">
+      <test-line-chart-container />
+    </div>
+    <div class="col-sm">
+      <test-line-chart-container />
+    </div>
   </div>
 </template>
 
