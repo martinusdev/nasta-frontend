@@ -91,7 +91,7 @@ export default class ErrorRateChart extends Vue {
         line: {
           fill: true,
           borderColor: '#f87979',
-          borderWidth: 2,
+          borderWidth: 1,
         },
         point: {
           radius: 1,
@@ -140,7 +140,7 @@ export default class ErrorRateChart extends Vue {
       const pointsCount = this.span;
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
-        labels.push(endPoint.add(5, 'minute').format('HH:mm'));
+        labels.push(endPoint.add(1, 'minute').format('HH:mm'));
       }
 
       const reportItems: ReportItem[] = reports.Items;
