@@ -19,7 +19,12 @@
           </div>
         </div>
       </form>
-      <line-chart v-if="loaded" :chartData="chartData" :options="options" />
+      <line-chart
+        v-if="loaded"
+        :chartData="chartData"
+        :options="options"
+        css-classes="chart-h200"
+      />
     </div>
   </div>
 </template>
@@ -75,6 +80,9 @@ export default class ErrorRateChart extends Vue {
           {
             ticks: {
               fontColor: 'white',
+              beginAtZero: true,
+              // Zaujimave, s tymto sa mozeme pohrat
+              // suggestedMax: 1,
             },
           },
         ],
@@ -86,8 +94,13 @@ export default class ErrorRateChart extends Vue {
           borderWidth: 2,
         },
         point: {
-          radius: 0,
+          radius: 1,
         },
+      },
+      maintainAspectRatio: false,
+      responsive: true,
+      tooltips: {
+        mode: 'nearest', // Toto je default, asi najlepsi pre nas.
       },
     };
   }
@@ -172,3 +185,9 @@ export default class ErrorRateChart extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.chart-h200 {
+  height: 200px;
+}
+</style>
