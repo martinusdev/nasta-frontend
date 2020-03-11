@@ -66,6 +66,8 @@ export default class ErrorRateChart extends Vue {
           {
             ticks: {
               fontColor: 'white',
+              autoSkip: true,
+              maxTicksLimit: 12,
             },
           },
         ],
@@ -122,10 +124,9 @@ export default class ErrorRateChart extends Vue {
 
       const endPoint = startPoint.clone();
 
-      const pointsCount = Math.round(this.span / 5);
+      const pointsCount = this.span;
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
-
         labels.push(endPoint.add(5, 'minute').format('HH:mm'));
       }
 
@@ -136,7 +137,7 @@ export default class ErrorRateChart extends Vue {
           .diff(startPoint, 'minutes');
 
         if (minutes >= 0) {
-          values[Math.round(minutes / 5)] = reportItems[key].report_value / 10;
+          values[minutes] = reportItems[key].report_value / 10;
         }
       }
 
