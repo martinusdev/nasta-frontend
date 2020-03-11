@@ -1,10 +1,10 @@
 <template>
-  <div class="col-sm">
-    <div>
+  <div class="col-sm-4">
+    <div class="single-chart-container">
       <form class="form-inline">
-        <label class="col-sm-1 col-form-label col-form-label-sm"
-          >Interval:</label
-        >
+        <label class="col-sm-2 col-form-label col-form-label-sm">
+          <small>Interval:</small>
+        </label>
         <div class="input-group">
           <input
             class="form-control-sm"
@@ -12,7 +12,7 @@
             min="30"
             max="1440"
             step="30"
-            v-model="spanInMinutes"
+            v-model="span"
           />
           <div class="form-control-sm">
             <span>{{ spanHumanized }}</span>
@@ -52,23 +52,24 @@ enum ChartType {
     BarChart,
   },
 })
-export default class ErrorRateChart extends Vue {
+export default class NastaChart extends Vue {
   @Prop({ default: 'error_rate_martinus' })
   reportName!: string;
   @Prop({ default: 'line' })
   chartType!: ChartType;
+  @Prop({ default: 60 })
+  span!: number;
+  @Prop({ default: 'minute' })
+  spanUnit!: string;
+  // Toto su data
   loaded: boolean;
   chartData: ChartData;
   options: ChartOptions;
-  spanInMinutes: number;
-  @Prop({ default: 60 })
-  defaultSpanInMinutes!: number;
   constructor() {
     super();
 
     this.loaded = false;
     this.chartData = {};
-    this.spanInMinutes = this.defaultSpanInMinutes;
 
     this.options = {
       legend: {
@@ -114,6 +115,9 @@ export default class ErrorRateChart extends Vue {
       },
     };
   }
+  created() {
+    this.$props.span = parseInt(this.$props.span, 10);
+  }
   async mounted() {
     this.loadData();
 
@@ -125,7 +129,18 @@ export default class ErrorRateChart extends Vue {
     try {
       const filterTime = moment();
       const endTime = filterTime.unix();
-      const startTime = filterTime.subtract(this.span, 'minute').unix();
+      const startTime = filterTime
+        .subtract(this.$props.span, this.$props.spanUnit)
+        .unix();
+      const labels: string[] = [];
+      const values: number[] = [];
+
+      let now = moment();
+      now = now.minute(Math.round(now.minute() / 5) * 5);
+      const startPoint = now
+        .clone()
+        .subtract(this.$props.span, this.$props.spanUnit);
+      const endPoint = startPoint.clone();
 
       const reports = await getReportsByRowName(
         this.$props.reportName,
@@ -136,16 +151,7 @@ export default class ErrorRateChart extends Vue {
         },
       );
 
-      const labels: string[] = [];
-      const values: number[] = [];
-
-      let now = moment();
-      now = now.minute(Math.round(now.minute() / 5) * 5);
-      const startPoint = now.clone().subtract(this.span, 'minute');
-
-      const endPoint = startPoint.clone();
-
-      const pointsCount = this.span;
+      const pointsCount = this.$props.span;
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
         labels.push(endPoint.add(1, 'minute').format('HH:mm'));
@@ -181,15 +187,13 @@ export default class ErrorRateChart extends Vue {
       // console.error(e);
     }
   }
-  @Watch('spanInMinutes')
+  @Watch('span')
   onPropertyChanged() {
+    this.$props.span = parseInt(this.$props.span, 10);
     this.loadData();
   }
-  get span(): number {
-    return parseInt(this.$data.spanInMinutes, 10);
-  }
   get spanHumanized() {
-    return moment.duration(this.span, 'minute').humanize();
+    return moment.duration(this.$props.span, this.$props.spanUnit).humanize();
   }
   get chartComponent() {
     return `${this.$props.chartType}-chart`;
@@ -200,5 +204,8 @@ export default class ErrorRateChart extends Vue {
 <style scoped>
 .chart-h200 {
   height: 200px;
+}
+.single-chart-container {
+  margin-bottom: 20px;
 }
 </style>
