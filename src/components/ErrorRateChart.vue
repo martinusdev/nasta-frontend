@@ -136,7 +136,7 @@ export default class ErrorRateChart extends Vue {
           .diff(startPoint, 'minutes');
 
         if (minutes >= 0) {
-          values[Math.round(minutes / 5)] = reportItems[key].report_value;
+          values[Math.round(minutes / 5)] = reportItems[key].report_value / 10;
         }
       }
 
