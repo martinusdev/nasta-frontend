@@ -199,7 +199,7 @@ export default class FCPHomepageChart extends Vue {
       // console.error(e);
     }
   }
-  @Watch('spanInMinutes')
+  @Watch('spanInDays')
   onPropertyChanged() {
     this.loadData();
   }
