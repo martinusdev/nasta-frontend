@@ -107,37 +107,30 @@ export default class ErrorRateChart extends Vue {
       const labels: string[] = [];
       const values: number[] = [];
 
-      const startingPoint = moment().subtract(
-        // Tu bacha lebo das opacne tieto argumenty a spravi string concat.
-        // Asi som mu nepovedal dost dobre, ze spanInMinutes je number.
-        // A mozno mu to je jedno.
-        (moment().minute() % 5) + parseInt(this.$data.spanInMinutes, 10),
-        'minute',
-      );
-      // console.log('Graf od ', startingPoint.format());
+      let now = moment();
+      now = now.minute(Math.round(now.minute() / 5) * 5);
+      const startPoint = now
+        .clone()
+        .subtract(this.$data.spanInMinutes, 'minute');
 
-      // Toto 12 je len proste 12 labels na x-ovej osi? -> ano, lebo povodne bolo 60 minut kazdych 5 minut = 12
-      const pointsCount = 12;
-      const minutesIncrement = Math.round(
-        parseInt(this.$data.spanInMinutes, 10) / pointsCount,
-      );
-      // console.log(minutesIncrement);
+      const endPoint = startPoint.clone();
+
+      const pointsCount = Math.round(this.$data.spanInMinutes / 5);
       for (let i = 0; i < pointsCount; i++) {
         values.push(NaN);
 
-        labels.push(
-          startingPoint.add(minutesIncrement, 'minute').format('HH:mm'),
-        );
+        labels.push(endPoint.add(5, 'minute').format('HH:mm'));
       }
 
       const reportItems: ReportItem[] = reports.Items;
       for (const key in reportItems) {
-        const minutes: number = +moment
+        const minutes: number = moment
           .unix(reportItems[key].report_time)
-          .format('m');
+          .diff(startPoint, 'minutes');
 
-        values[Math.round(minutes / minutesIncrement)] =
-          reportItems[key].report_value;
+        if (minutes >= 0) {
+          values[Math.round(minutes / 5)] = reportItems[key].report_value;
+        }
       }
 
       this.chartData = {
@@ -146,7 +139,7 @@ export default class ErrorRateChart extends Vue {
           {
             spanGaps: false,
             lineTension: 0,
-            label: 'Error rate ' + startingPoint.format('YYYY-MM-DD HH:mm:ss'),
+            label: 'Error rate ' + endPoint.format('YYYY-MM-DD HH:mm:ss'),
             backgroundColor: '#f87979',
             data: values,
           },
