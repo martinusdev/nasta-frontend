@@ -1,17 +1,26 @@
 <template>
-  <div>
-    <small>
-      Interval:
-      <input
-        type="range"
-        min="30"
-        max="1440"
-        step="30"
-        v-model="spanInMinutes"
-      />
-      {{ spanInMinutes }} minutes
-    </small>
-    <line-chart v-if="loaded" :chartData="chartData" :options="options" />
+  <div class="col-sm">
+    <form>
+      <div class="form-group row">
+        <label class="col-sm-1 col-form-label col-form-label-sm">Interval:</label>
+        <div class="col-sm-4">
+          <div class="input-group mb-2">
+            <input
+              class="form-control-sm"
+              type="range"
+              min="30"
+              max="1440"
+              step="30"
+              v-model="spanInMinutes"
+            />
+            <div class="form-control-sm">
+              <span>{{ spanInMinutes }} minutes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <line-chart v-if="loaded" :chartData="chartData" :options="options" />
+    </form>
   </div>
 </template>
 
